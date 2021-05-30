@@ -34,7 +34,7 @@ pipeline {
 
   post{
     always{
-      archoveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+      archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
       echo "Pipeline for Worker is complete.."
     }
   }
