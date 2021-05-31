@@ -1,0 +1,57 @@
+pipeline {
+  agent any
+
+  tools{
+    maven "3.6.3"
+  }
+
+  stages{
+    stage('build'){
+      when{
+        changeset "**/worker/**"
+      }
+      steps{
+        echo "Compiling Worker App"
+        dir('worker'){
+          sh 'mvn compile'
+        }
+      }
+    }
+    stage('test'){
+      when{
+        changeset "**/worker/**"
+      }
+      steps{
+        echo "Running Unit Tests on Worker App"
+        dir('worker'){
+          sh 'mvn clean test'
+        }
+      }
+    }
+    stage('package'){
+      when{
+        branch 'master'
+        changeset "**/worker/**"
+      }
+      steps{
+        echo "Packaging Worker App"
+        dir('worker'){
+          sh 'mvn package -DskipTests'
+          archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+        }
+      }
+    }
+  }
+
+  post{
+    always{
+      echo "Pipeline for Worker is complete.."
+    }
+    failure{
+      slackSend (channel: "instavote-cd", message: "Build Failure - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+    }
+    success{
+      slackSend (channel: "instavote-cd", message: "Build Succeeded - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+    }
+  }
+}
