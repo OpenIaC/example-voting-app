@@ -8,7 +8,7 @@ import json
 option_a = os.getenv('OPTION_A', "Travis")
 option_b = os.getenv('OPTION_B', "Circle CI")
 hostname = socket.gethostname()
-version = 'v3'
+version = 'v4'
 
 app = Flask(__name__)
 
